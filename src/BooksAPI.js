@@ -1,4 +1,4 @@
-
+/* global localStorage, fetch */
 const api = "https://reactnd-books-api.udacity.com"
 
 
