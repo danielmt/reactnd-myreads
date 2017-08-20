@@ -18,7 +18,7 @@ class BooksApp extends React.Component {
           wantToRead = [],
           read = [];
 
-      books.map(book => {
+      for (let book of books) {
         switch(book.shelf) {
         case 'currentlyReading':
           currentlyReading.push(book);
@@ -32,7 +32,7 @@ class BooksApp extends React.Component {
         default:
           console.log('Unsupported book shelf: ', book.shelf)
         }
-      });
+      }
 
       this.setState({ currentlyReading, wantToRead, read });
     });
