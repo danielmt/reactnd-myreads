@@ -75,6 +75,8 @@ class BooksApp extends Component {
       console.log('searching for', term)
 
       BooksAPI.search(term, 10).then(books => {
+        this.searching = false
+
         if (books && 'error' in books) {
           console.log('nothing found')
           return
@@ -85,8 +87,6 @@ class BooksApp extends Component {
         this.setState({
           searchBooks: books,
         })
-
-        this.searching = false
       })
     }
   }
