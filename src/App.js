@@ -12,52 +12,68 @@ class BooksApp extends Component {
       currentlyReading: [],
       wantToRead: [],
       read: [],
-    }
+    },
+    bookshelves: [
+      { title: 'Currently Reading', value: 'currentlyReading' },
+      { title: 'Want to Read', value: 'wantToRead' },
+      { title: 'Read', value: 'read' },
+    ],
   }
 
   componentDidMount = () => {
     BooksAPI.getAll().then(books => {
       let currentlyReading = [],
-          wantToRead = [],
-          read = []
+        wantToRead = [],
+        read = []
 
       for (let book of books) {
-        switch(book.shelf) {
-        case 'currentlyReading':
-          currentlyReading.push(book)
-          break
-        case 'wantToRead':
-          wantToRead.push(book)
-          break
-        case 'read':
-          read.push(book)
-          break
-        default:
-          console.log('Unsupported book shelf: ', book.shelf)
+        switch (book.shelf) {
+          case 'currentlyReading':
+            currentlyReading.push(book)
+            break
+          case 'wantToRead':
+            wantToRead.push(book)
+            break
+          case 'read':
+            read.push(book)
+            break
+          default:
+            console.log('Unsupported book shelf: ', book.shelf)
         }
       }
 
       this.setState({
         books: update(this.state.books, {
-          currentlyReading: {$set: currentlyReading},
-          wantToRead: {$set: wantToRead},
-          read: {$set: read},
-        })
+          currentlyReading: { $set: currentlyReading },
+          wantToRead: { $set: wantToRead },
+          read: { $set: read },
+        }),
       })
     })
   }
 
   moveToBookshelf = (book, shelf) => {
-    console.log('should move ', book.title, 'to', shelf)
+    BooksAPI.update(book, shelf).then(() => {
+      let newBook = update(book, { shelf: { $set: shelf } })
+
+      this.setState({
+        books: update(this.state.books, {
+          [book.shelf]: { $set: this.state.books[book.shelf].filter(b => b.id !== book.id) },
+          [shelf]: { $push: [newBook] },
+        }),
+      })
+    })
   }
 
   render() {
+    const { books, bookshelves } = this.state
+
     return (
       <div className="app">
         <Route exact path="/" render={() => (
-          <ListBooks books={this.state.books} onMoveToBookshelf={this.moveToBookshelf} />
+          <ListBooks books={books} bookshelves={bookshelves} onMoveToBookshelf={this.moveToBookshelf} />
         )} />
-        <Route path="/search" render={SearchBooks} />
+        <Route path="/search" component={SearchBooks} />
       </div>
     )
   }
