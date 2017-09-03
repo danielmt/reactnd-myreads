@@ -1,53 +1,63 @@
-import React from 'react'
+import React, { Component } from 'react'
 import { Route } from 'react-router-dom'
+import update from 'immutability-helper'
 import * as BooksAPI from './BooksAPI'
 import SearchBooks from './SearchBooks'
 import ListBooks from './ListBooks'
 import './App.css'
 
-class BooksApp extends React.Component {
+class BooksApp extends Component {
   state = {
-    currentlyReading: [],
-    wantToRead: [],
-    read: [],
-  };
+    books: {
+      currentlyReading: [],
+      wantToRead: [],
+      read: [],
+    }
+  }
 
   componentDidMount = () => {
     BooksAPI.getAll().then(books => {
       let currentlyReading = [],
           wantToRead = [],
-          read = [];
+          read = []
 
       for (let book of books) {
         switch(book.shelf) {
         case 'currentlyReading':
-          currentlyReading.push(book);
-          break;
+          currentlyReading.push(book)
+          break
         case 'wantToRead':
-          wantToRead.push(book);
-          break;
+          wantToRead.push(book)
+          break
         case 'read':
-          read.push(book);
-          break;
+          read.push(book)
+          break
         default:
           console.log('Unsupported book shelf: ', book.shelf)
         }
       }
 
-      this.setState({ currentlyReading, wantToRead, read });
-    });
-  };
+      this.setState({
+        books: update(this.state.books, {
+          currentlyReading: {$set: currentlyReading},
+          wantToRead: {$set: wantToRead},
+          read: {$set: read},
+        })
+      })
+    })
+  }
+
+  moveToBookshelf = (book, shelf) => {
+    console.log('should move ', book.title, 'to', shelf)
+  }
 
   render() {
     return (
       <div className="app">
         <Route exact path="/" render={() => (
-          <ListBooks currentlyReading={ this.state.currentlyReading }
-                     wantToRead={ this.state.wantToRead }
-                     read={ this.state.read }
-                   />
-          )}/>
-        <Route path="/search" render={SearchBooks}/>
+          <ListBooks books={this.state.books} onMoveToBookshelf={this.moveToBookshelf} />
+        )} />
+        <Route path="/search" render={SearchBooks} />
       </div>
     )
   }
