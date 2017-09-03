@@ -2,15 +2,34 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import debounce from 'lodash.debounce'
+import Book from './Book'
 
 class SearchBooks extends Component {
   static propTypes = {
+    books: PropTypes.array.isRequired,
     onSearchBooks: PropTypes.func.isRequired,
+    bookshelves: PropTypes.array.isRequired,
+    onMoveToBookshelf: PropTypes.func.isRequired,
+  }
+
+  state = {
+    term: '',
+  }
+
+  searchBooks = debounce(term => {
+    if (term.length > 3) {
+      this.props.onSearchBooks(term)
+    }
+  }, 400)
+
+  updateTerm = term => {
+    this.setState({ term })
+    this.searchBooks(term)
   }
 
   render() {
-    const { onSearchBooks } = this.props
-    const searchBooks = debounce(term => onSearchBooks(term), 500)
+    const { books, bookshelves, onMoveToBookshelf } = this.props
+    const { term } = this.state
 
     return (
       <div className="search-books">
@@ -29,13 +48,21 @@ class SearchBooks extends Component {
           */}
             <input
               type="text"
-              onChange={event => searchBooks(event.target.value)}
+              value={term}
+              onChange={event => this.updateTerm(event.target.value)}
               placeholder="Search by title or author"
             />
           </div>
         </div>
         <div className="search-books-results">
-          <ol className="books-grid" />
+          <ol className="books-grid">
+            {books &&
+              books.map(book => (
+                <li key={book.id}>
+                  <Book book={book} bookshelves={bookshelves} onMoveToBookshelf={onMoveToBookshelf} />
+                </li>
+              ))}
+          </ol>
         </div>
       </div>
     )

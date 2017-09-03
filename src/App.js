@@ -13,12 +13,15 @@ class BooksApp extends Component {
       wantToRead: [],
       read: [],
     },
+    searchBooks: [],
     bookshelves: [
       { title: 'Currently Reading', value: 'currentlyReading' },
       { title: 'Want to Read', value: 'wantToRead' },
       { title: 'Read', value: 'read' },
     ],
   }
+
+  searching = false
 
   componentDidMount = () => {
     BooksAPI.getAll().then(books => {
@@ -66,7 +69,26 @@ class BooksApp extends Component {
   }
 
   searchBooks = term => {
-    console.log('searching for', term)
+    if (!this.searching) {
+      this.searching = true
+
+      console.log('searching for', term)
+
+      BooksAPI.search(term, 10).then(books => {
+        if (books && 'error' in books) {
+          console.log('nothing found')
+          return
+        }
+
+        console.log('found', books.length, 'books')
+
+        this.setState({
+          searchBooks: books,
+        })
+
+        this.searching = false
+      })
+    }
   }
 
   render() {
@@ -79,7 +101,17 @@ class BooksApp extends Component {
           path="/"
           render={() => <ListBooks books={books} bookshelves={bookshelves} onMoveToBookshelf={this.moveToBookshelf} />}
         />
-        <Route path="/search" render={() => <SearchBooks onSearchBooks={this.searchBooks} />} />
+        <Route
+          path="/search"
+          render={() => (
+            <SearchBooks
+              books={this.state.searchBooks}
+              onSearchBooks={this.searchBooks}
+              bookshelves={bookshelves}
+              onMoveToBookshelf={this.moveToBookshelf}
+            />
+          )}
+        />
       </div>
     )
   }
