@@ -5,7 +5,7 @@ import BookShelf from './BookShelf'
 
 class ListBooks extends Component {
   static propTypes = {
-    books: PropTypes.object.isRequired,
+    books: PropTypes.array.isRequired,
     bookshelves: PropTypes.array.isRequired,
     onMoveToBookshelf: PropTypes.func.isRequired,
   }
@@ -20,10 +20,13 @@ class ListBooks extends Component {
         </div>
         <div className="list-books-content">
           {bookshelves.map(bookshelf => (
-            <BookShelf title={bookshelf.title} key={bookshelf.value}
-                       books={this.props.books[bookshelf.value]}
-                       bookshelves={bookshelves}
-                       onMoveToBookshelf={onMoveToBookshelf} />
+            <BookShelf
+              title={bookshelf.title}
+              key={bookshelf.value}
+              books={this.props.books.filter(b => b.shelf === bookshelf.value)}
+              bookshelves={bookshelves}
+              onMoveToBookshelf={onMoveToBookshelf}
+            />
           ))}
         </div>
         <div className="open-search">

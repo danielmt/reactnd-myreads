@@ -8,11 +8,7 @@ import './App.css'
 
 class BooksApp extends Component {
   state = {
-    books: {
-      currentlyReading: [],
-      wantToRead: [],
-      read: [],
-    },
+    books: [],
     searchBooks: [],
     bookshelves: [
       { title: 'Currently Reading', value: 'currentlyReading' },
@@ -25,46 +21,30 @@ class BooksApp extends Component {
 
   componentDidMount = () => {
     BooksAPI.getAll().then(books => {
-      let currentlyReading = [],
-        wantToRead = [],
-        read = []
-
-      for (let book of books) {
-        switch (book.shelf) {
-          case 'currentlyReading':
-            currentlyReading.push(book)
-            break
-          case 'wantToRead':
-            wantToRead.push(book)
-            break
-          case 'read':
-            read.push(book)
-            break
-          default:
-            console.log('Unsupported book shelf: ', book.shelf)
-        }
-      }
-
-      this.setState({
-        books: update(this.state.books, {
-          currentlyReading: { $set: currentlyReading },
-          wantToRead: { $set: wantToRead },
-          read: { $set: read },
-        }),
-      })
+      this.setState({ books })
     })
   }
 
   moveToBookshelf = (book, shelf) => {
+    console.log('moving book', book.title, 'from', book.shelf || 'none', 'to', shelf)
+
     BooksAPI.update(book, shelf).then(() => {
       let newBook = update(book, { shelf: { $set: shelf } })
+      let index = this.state.books.indexOf(book)
 
-      this.setState({
-        books: update(this.state.books, {
-          [book.shelf]: { $set: this.state.books[book.shelf].filter(b => b.id !== book.id) },
-          [shelf]: { $push: [newBook] },
-        }),
-      })
+      if (index !== -1) {
+        this.setState({
+          books: update(this.state.books, {
+            [index]: { $set: newBook },
+          }),
+        })
+      } else {
+        this.setState({
+          books: update(this.state.books, {
+            $push: [newBook],
+          }),
+        })
+      }
     })
   }
 
@@ -78,15 +58,13 @@ class BooksApp extends Component {
         this.searching = false
 
         if (books && 'error' in books) {
-          console.log('nothing found')
+          console.log('search for ', term, ': nothing found')
           return
         }
 
-        console.log('found', books.length, 'books')
+        console.log('found', books.length, 'books with', term)
 
-        this.setState({
-          searchBooks: books,
-        })
+        this.setState({ searchBooks: books })
       })
     }
   }
