@@ -15,12 +15,14 @@ class SearchBooks extends Component {
   state = {
     term: '',
     didSearch: false,
+    searching: false,
   }
 
   searchBooks = debounce(term => {
     if (term.length > 3) {
+      this.setState({ searching: true })
       this.props.onSearchBooks(term).then(() => {
-        this.setState({ didSearch: true })
+        this.setState({ didSearch: true, searching: false })
       })
     }
   }, 400)
@@ -32,11 +34,11 @@ class SearchBooks extends Component {
 
   render() {
     const { books, bookshelves, onMoveToBookshelf } = this.props
-    const { term, didSearch } = this.state
+    const { term, didSearch, searching } = this.state
 
     return (
       <div className="search-books">
-        <div className="search-books-bar">
+        <div className={searching ? 'search-books-bar search-books-bar-loading' : 'search-books-bar'}>
           <Link className="close-search" to="/">
             Close
           </Link>
@@ -69,7 +71,8 @@ class SearchBooks extends Component {
             </ol>
           )}
 
-          {books.length === 0 && didSearch && <div>Nothing found!</div>}
+          {books.length === 0 &&
+          didSearch && <div className="search-books-no-match">Your search did not match any books.</div>}
         </div>
       </div>
     )
