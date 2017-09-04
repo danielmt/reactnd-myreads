@@ -26,7 +26,7 @@ class BooksApp extends Component {
   moveToBookshelf = (book, shelf) => {
     console.log('moving book', book.title, 'from', book.shelf || 'none', 'to', shelf)
 
-    BooksAPI.update(book, shelf).then(() => {
+    return BooksAPI.update(book, shelf).then(() => {
       let newBook = update(book, { shelf: { $set: shelf } })
       let index = this.state.books.indexOf(book)
 
@@ -37,9 +37,14 @@ class BooksApp extends Component {
           }),
         })
       } else {
+        let searchIndex = this.state.searchBooks.indexOf(book)
+
         this.setState({
           books: update(this.state.books, {
             $push: [newBook],
+          }),
+          searchBooks: update(this.state.searchBooks, {
+            $splice: [[searchIndex, 1]],
           }),
         })
       }
@@ -64,7 +69,7 @@ class BooksApp extends Component {
   }
 
   render() {
-    const { books, bookshelves } = this.state
+    const { books, searchBooks, bookshelves } = this.state
 
     return (
       <div className="app">
@@ -77,7 +82,8 @@ class BooksApp extends Component {
           path="/search"
           render={() => (
             <SearchBooks
-              books={this.state.searchBooks}
+              currentBooks={books.map(b => b.id)}
+              books={searchBooks}
               onSearchBooks={this.searchBooks}
               bookshelves={bookshelves}
               onMoveToBookshelf={this.moveToBookshelf}

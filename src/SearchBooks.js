@@ -6,6 +6,7 @@ import Book from './Book'
 
 class SearchBooks extends Component {
   static propTypes = {
+    currentBooks: PropTypes.array.isRequired,
     books: PropTypes.array.isRequired,
     onSearchBooks: PropTypes.func.isRequired,
     bookshelves: PropTypes.array.isRequired,
@@ -32,8 +33,15 @@ class SearchBooks extends Component {
     this.searchBooks(term)
   }
 
+  moveToBookshelf = (book, shelf) => {
+    this.setState({ searching: true })
+    this.props.onMoveToBookshelf(book, shelf).then(() => {
+      this.setState({ searching: false })
+    })
+  }
+
   render() {
-    const { books, bookshelves, onMoveToBookshelf } = this.props
+    const { books, bookshelves, currentBooks } = this.props
     const { term, didSearch, searching } = this.state
 
     return (
@@ -63,14 +71,16 @@ class SearchBooks extends Component {
         <div className="search-books-results">
           {books.length > 0 && (
             <ol className="books-grid">
-              {books.map(book => (
-                <li key={book.id}>
-                  <Book book={book} bookshelves={bookshelves} onMoveToBookshelf={onMoveToBookshelf} />
-                </li>
-              ))}
+              {books.map(
+                book =>
+                  currentBooks.indexOf(book.id) < 0 && (
+                    <li key={book.id}>
+                      <Book book={book} bookshelves={bookshelves} onMoveToBookshelf={this.moveToBookshelf} />
+                    </li>
+                  )
+              )}
             </ol>
           )}
-
           {books.length === 0 &&
           didSearch && <div className="search-books-no-match">Your search did not match any books.</div>}
         </div>
