@@ -14,11 +14,14 @@ class SearchBooks extends Component {
 
   state = {
     term: '',
+    didSearch: false,
   }
 
   searchBooks = debounce(term => {
     if (term.length > 3) {
-      this.props.onSearchBooks(term)
+      this.props.onSearchBooks(term).then(() => {
+        this.setState({ didSearch: true })
+      })
     }
   }, 400)
 
@@ -29,7 +32,7 @@ class SearchBooks extends Component {
 
   render() {
     const { books, bookshelves, onMoveToBookshelf } = this.props
-    const { term } = this.state
+    const { term, didSearch } = this.state
 
     return (
       <div className="search-books">
@@ -54,15 +57,19 @@ class SearchBooks extends Component {
             />
           </div>
         </div>
+
         <div className="search-books-results">
-          <ol className="books-grid">
-            {books &&
-              books.map(book => (
+          {books.length > 0 && (
+            <ol className="books-grid">
+              {books.map(book => (
                 <li key={book.id}>
                   <Book book={book} bookshelves={bookshelves} onMoveToBookshelf={onMoveToBookshelf} />
                 </li>
               ))}
-          </ol>
+            </ol>
+          )}
+
+          {books.length === 0 && didSearch && <div>Nothing found!</div>}
         </div>
       </div>
     )

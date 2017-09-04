@@ -17,8 +17,6 @@ class BooksApp extends Component {
     ],
   }
 
-  searching = false
-
   componentDidMount = () => {
     BooksAPI.getAll().then(books => {
       this.setState({ books })
@@ -49,24 +47,20 @@ class BooksApp extends Component {
   }
 
   searchBooks = term => {
-    if (!this.searching) {
-      this.searching = true
+    console.log('searching for', term)
 
-      console.log('searching for', term)
+    return BooksAPI.search(term, 10).then(books => {
+      if (books && 'error' in books) {
+        this.setState({ searchBooks: [] })
 
-      BooksAPI.search(term, 10).then(books => {
-        this.searching = false
+        console.log('search for ', term, ': nothing found')
+        return
+      }
 
-        if (books && 'error' in books) {
-          console.log('search for ', term, ': nothing found')
-          return
-        }
+      console.log('found', books.length, 'books with', term)
 
-        console.log('found', books.length, 'books with', term)
-
-        this.setState({ searchBooks: books })
-      })
-    }
+      this.setState({ searchBooks: books })
+    })
   }
 
   render() {
