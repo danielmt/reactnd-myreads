@@ -4,12 +4,17 @@ import PropTypes from 'prop-types'
 class Book extends Component {
   static propTypes = {
     book: PropTypes.object.isRequired,
-    bookshelves: PropTypes.array.isRequired,
     onMoveToBookshelf: PropTypes.func.isRequired,
   }
 
   render() {
-    const { book, bookshelves, onMoveToBookshelf } = this.props
+    const { book, onMoveToBookshelf } = this.props
+
+    const bookshelves = [
+      { title: 'Currently Reading', value: 'currentlyReading' },
+      { title: 'Want to Read', value: 'wantToRead' },
+      { title: 'Read', value: 'read' },
+    ]
 
     return (
       <div className="book">
@@ -22,19 +27,23 @@ class Book extends Component {
           />
           <div className="book-shelf-changer">
             <select value={book.shelf || ''} onChange={event => onMoveToBookshelf(book, event.target.value)}>
-              <option value="none" disabled>
+              <option value="" disabled>
                 Move to...
               </option>
-              {bookshelves.map(bookshelf => (
+              {bookshelves.map(bookshelf =>
                 <option value={bookshelf.value} key={bookshelf.value}>
                   {bookshelf.title}
                 </option>
-              ))}
+              )}
             </select>
           </div>
         </div>
-        <div className="book-title">{book.title}</div>
-        <div className="book-authors">{book.authors && book.authors.join(', ')}</div>
+        <div className="book-title">
+          {book.title}
+        </div>
+        <div className="book-authors">
+          {book.authors && book.authors.join(', ')}
+        </div>
       </div>
     )
   }

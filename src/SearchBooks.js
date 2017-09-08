@@ -9,7 +9,6 @@ class SearchBooks extends Component {
     currentBooks: PropTypes.array.isRequired,
     books: PropTypes.array.isRequired,
     onSearchBooks: PropTypes.func.isRequired,
-    bookshelves: PropTypes.array.isRequired,
     onMoveToBookshelf: PropTypes.func.isRequired,
   }
 
@@ -41,7 +40,7 @@ class SearchBooks extends Component {
   }
 
   render() {
-    const { books, bookshelves, currentBooks } = this.props
+    const { books, currentBooks } = this.props
     const { term, didSearch, searching } = this.state
 
     return (
@@ -69,20 +68,17 @@ class SearchBooks extends Component {
         </div>
 
         <div className="search-books-results">
-          {books.length > 0 && (
+          {books.length > 0 &&
             <ol className="books-grid">
               {books.map(
                 book =>
-                  currentBooks.indexOf(book.id) < 0 && (
-                    <li key={book.id}>
-                      <Book book={book} bookshelves={bookshelves} onMoveToBookshelf={this.moveToBookshelf} />
-                    </li>
-                  )
+                  currentBooks.indexOf(book.id) < 0 &&
+                  <li key={book.id}>
+                    <Book book={book} onMoveToBookshelf={this.moveToBookshelf} />
+                  </li>
               )}
-            </ol>
-          )}
-          {books.length === 0 &&
-          didSearch && <div className="search-books-no-match">Your search did not match any books.</div>}
+            </ol>}
+          {books.length === 0 && didSearch && <div className="search-books-no-match">Your search did not match any books.</div>}
         </div>
       </div>
     )

@@ -10,11 +10,6 @@ class BooksApp extends Component {
   state = {
     books: [],
     searchBooks: [],
-    bookshelves: [
-      { title: 'Currently Reading', value: 'currentlyReading' },
-      { title: 'Want to Read', value: 'wantToRead' },
-      { title: 'Read', value: 'read' },
-    ],
   }
 
   componentDidMount = () => {
@@ -69,26 +64,20 @@ class BooksApp extends Component {
   }
 
   render() {
-    const { books, searchBooks, bookshelves } = this.state
+    const { books, searchBooks } = this.state
 
     return (
       <div className="app">
-        <Route
-          exact
-          path="/"
-          render={() => <ListBooks books={books} bookshelves={bookshelves} onMoveToBookshelf={this.moveToBookshelf} />}
-        />
+        <Route exact path="/" render={() => <ListBooks books={books} onMoveToBookshelf={this.moveToBookshelf} />} />
         <Route
           path="/search"
-          render={() => (
+          render={() =>
             <SearchBooks
               currentBooks={books.map(b => b.id)}
               books={searchBooks}
               onSearchBooks={this.searchBooks}
-              bookshelves={bookshelves}
               onMoveToBookshelf={this.moveToBookshelf}
-            />
-          )}
+            />}
         />
       </div>
     )
