@@ -71,13 +71,7 @@ class BooksApp extends Component {
         <Route exact path="/" render={() => <ListBooks books={books} onMoveToBookshelf={this.moveToBookshelf} />} />
         <Route
           path="/search"
-          render={() =>
-            <SearchBooks
-              currentBooks={books.map(b => b.id)}
-              books={searchBooks}
-              onSearchBooks={this.searchBooks}
-              onMoveToBookshelf={this.moveToBookshelf}
-            />}
+          render={() => <SearchBooks books={searchBooks} onSearchBooks={this.searchBooks} onMoveToBookshelf={this.moveToBookshelf} />}
         />
       </div>
     )
