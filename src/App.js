@@ -9,12 +9,18 @@ import './App.css'
 class BooksApp extends Component {
   state = {
     books: [],
+    bookshelf: {},
     searchBooks: [],
   }
 
   componentDidMount = () => {
     BooksAPI.getAll().then(books => {
-      this.setState({ books })
+      let bookshelf = {}
+      for (let book of books) {
+        bookshelf[book.id] = book.shelf
+      }
+
+      this.setState({ books, bookshelf })
     })
   }
 
@@ -39,10 +45,16 @@ class BooksApp extends Component {
             $push: [newBook],
           }),
           searchBooks: update(this.state.searchBooks, {
-            $splice: [[searchIndex, 1]],
+            [searchIndex]: { $set: newBook },
           }),
         })
       }
+
+      this.setState({
+        bookshelf: update(this.state.bookshelf, {
+          [newBook.id]: { $set: newBook.shelf },
+        }),
+      })
     })
   }
 
@@ -59,7 +71,13 @@ class BooksApp extends Component {
 
       console.log('found', books.length, 'books with', term)
 
-      this.setState({ searchBooks: books })
+      const { bookshelf } = this.state
+      let newBooks = books.map(book => {
+        book.shelf = bookshelf[book.id] || 'none'
+        return book
+      })
+
+      this.setState({ searchBooks: newBooks })
     })
   }
 
