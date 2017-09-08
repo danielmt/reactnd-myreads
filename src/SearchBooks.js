@@ -20,7 +20,7 @@ class SearchBooks extends Component {
   }
 
   searchBooks = debounce(term => {
-    if (term.length > 3) {
+    if (term.length > 2) {
       this.setState({ searching: true })
       this.props.onSearchBooks(term).then(() => {
         this.setState({ didSearch: true, searching: false })
