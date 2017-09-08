@@ -17,8 +17,6 @@ class Book extends Component {
           <div
             className="book-cover"
             style={{
-              width: 128,
-              height: 193,
               backgroundImage: `url(${book.imageLinks.smallThumbnail})`,
             }}
           />
